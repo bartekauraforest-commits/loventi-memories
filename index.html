@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FAF7F2">
+<title>LOVENTI MEMORIES — prototyp</title>
+<style>
+:root{
+  --bg:#FAF7F2; --surface:#FFFFFF; --ink:#1C1917; --ink2:#78716C;
+  --accent:#A8836B; --accent-soft:#F0E6DD; --line:#E8E1D6;
+  --danger:#A34D42; --ok:#4C7A5C;
+  --radius:20px; --radius-btn:18px;
+  --shadow:0 8px 24px rgba(28,25,23,.08);
+  --serif:'New York','Playfair Display',Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button{font-family:var(--sans);border:none;cursor:pointer;background:none;color:inherit}
+input,select,textarea{font-family:var(--sans);font-size:17px;color:var(--ink)}
+.hidden{display:none!important}
+
+/* ---------- operator UI ---------- */
+.wrap{max-width:720px;margin:0 auto;padding:24px 20px 64px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0 28px}
+.brand{font-size:13px;letter-spacing:.35em;font-weight:700;color:var(--accent)}
+.brand span{color:var(--ink)}
+.proto-badge{font-size:11px;letter-spacing:.12em;color:var(--ink2);border:1px solid var(--line);border-radius:99px;padding:4px 10px}
+h1.page{font-family:var(--serif);font-size:34px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.sub{color:var(--ink2);margin-bottom:28px;font-size:15px}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+.event-card{display:flex;align-items:center;gap:16px;cursor:pointer;transition:transform .2s}
+.event-card:active{transform:scale(.98)}
+.event-dot{width:52px;height:52px;border-radius:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:22px;color:#fff}
+.event-info{flex:1;min-width:0}
+.event-title{font-family:var(--serif);font-size:20px;font-weight:600}
+.event-meta{color:var(--ink2);font-size:14px;margin-top:2px}
+.chev{color:var(--line);font-size:22px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:17px 24px;
+  border-radius:var(--radius-btn);font-size:17px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:active{transform:scale(.97);opacity:.9}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn-danger-ghost{background:transparent;color:var(--danger)}
+.btn-row{display:flex;gap:12px}.btn-row .btn{flex:1}
+.empty{text-align:center;padding:64px 24px;color:var(--ink2)}
+.empty .big{font-family:var(--serif);font-size:24px;color:var(--ink);margin-bottom:8px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--ink2);margin-bottom:8px;text-transform:uppercase}
+.field input[type=text],.field input[type=date],.field select,.field textarea{
+  width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.seg{display:flex;background:var(--accent-soft);border-radius:14px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{flex:1;min-width:56px;padding:11px 6px;border-radius:11px;font-size:15px;font-weight:600;color:var(--ink2)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(28,25,23,.1)}
+.swatches{display:flex;gap:12px;flex-wrap:wrap}
+.swatch{width:56px;height:56px;border-radius:18px;border:3px solid transparent;transition:transform .15s}
+.swatch.on{border-color:var(--ink);transform:scale(1.08)}
+.back{color:var(--ink2);font-size:15px;padding:8px 0;margin-bottom:8px;display:inline-flex;align-items:center;gap:6px}
+.stat-row{display:flex;gap:12px;margin-bottom:16px}
+.stat{flex:1;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center}
+.stat .n{font-family:var(--serif);font-size:30px;font-weight:600}
+.stat .l{font-size:12px;color:var(--ink2);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.note{background:var(--accent-soft);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--ink2);margin-top:16px}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gal-item{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:3/4}
+.gal-item video{width:100%;height:100%;object-fit:cover}
+.gal-name{position:absolute;left:0;right:0;bottom:0;padding:20px 10px 8px;font-size:13px;color:#fff;
+  background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.gal-actions{display:flex;gap:8px;margin-top:8px}
+.gal-actions button{flex:1;font-size:13px;padding:8px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-weight:600}
+.gal-actions button.del{color:var(--danger)}
+
+/* ---------- kiosk ---------- */
+#kiosk{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;overflow:hidden;background:var(--k-bg,#FAF7F2);color:var(--k-ink,#1C1917)}
+.k-orn{font-size:20px;letter-spacing:.5em;opacity:.55;margin-bottom:22px}
+.k-eyebrow{font-size:clamp(13px,1.8vw,18px);letter-spacing:.4em;text-transform:uppercase;opacity:.6;margin-bottom:18px;font-weight:600}
+.k-title{font-family:var(--serif);font-size:clamp(40px,9vw,110px);font-weight:600;line-height:1.08;letter-spacing:-.01em;padding:0 6vw}
+.k-sub{font-size:clamp(16px,2.6vw,26px);opacity:.65;margin-top:18px}
+.k-msg{font-family:var(--serif);font-style:italic;font-size:clamp(17px,2.6vw,26px);opacity:.75;margin-top:30px;max-width:34em;padding:0 8vw}
+.k-cta{margin-top:7vh;padding:22px 52px;border-radius:99px;background:var(--k-accent,#A8836B);color:#fff;
+  font-size:clamp(18px,2.6vw,26px);font-weight:600;box-shadow:0 12px 40px rgba(0,0,0,.18);animation:breathe 3.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.k-cta:active{transform:scale(.96)}
+.k-btn{padding:20px 46px;border-radius:99px;font-size:clamp(17px,2.4vw,24px);font-weight:600}
+.k-btn.pri{background:var(--k-accent,#A8836B);color:#fff;box-shadow:0 10px 32px rgba(0,0,0,.16)}
+.k-btn.sec{background:transparent;border:2px solid currentColor;opacity:.75}
+.k-count{font-family:var(--serif);font-size:clamp(120px,30vw,320px);font-weight:600;animation:pop .9s ease both}
+@keyframes pop{0%{transform:scale(1.35);opacity:0}25%{transform:scale(1);opacity:1}85%{opacity:1}100%{opacity:.25}}
+#camWrap{position:fixed;inset:0;background:#000}
+#cam{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+#recRing{position:fixed;inset:14px;border-radius:28px;border:4px solid rgba(255,255,255,.28);pointer-events:none}
+#recBar{position:fixed;left:14px;right:14px;top:14px;height:4px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.25)}
+#recFill{height:100%;width:0%;background:#fff;border-radius:99px;transition:width .25s linear}
+#recTime{position:fixed;top:34px;left:0;right:0;text-align:center;color:#fff;font-size:clamp(20px,3.4vw,30px);
+  font-weight:600;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+#recDot{display:inline-block;width:12px;height:12px;border-radius:50%;background:#E5484D;margin-right:10px;animation:blink 1.1s infinite}
+@keyframes blink{50%{opacity:.25}}
+#stopBtn{position:fixed;bottom:max(38px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+  padding:16px 40px;border-radius:99px;background:rgba(255,255,255,.92);color:#111;font-size:19px;font-weight:600}
+#prevVideo{position:fixed;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.prev-bar{position:fixed;bottom:0;left:0;right:0;padding:22px 22px max(30px,env(safe-area-inset-bottom));
+  display:flex;gap:14px;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.prev-bar .k-btn{flex:1}
+.prev-bar .k-btn.sec{color:#fff;border-color:rgba(255,255,255,.6);opacity:1}
+.k-heart{font-size:clamp(70px,16vw,150px);animation:heartIn 2.4s ease both}
+@keyframes heartIn{0%{transform:scale(.3);opacity:0}30%{transform:scale(1.15);opacity:1}45%{transform:scale(1)}80%{opacity:1}100%{opacity:1}}
+.k-nameInput{margin-top:34px;padding:16px 22px;border:2px solid rgba(0,0,0,.15);border-radius:16px;font-size:20px;
+  text-align:center;background:rgba(255,255,255,.85);width:min(420px,80vw);outline:none}
+#exitZone{position:fixed;top:0;left:0;width:90px;height:90px;z-index:120}
+.spin{width:46px;height:46px;border-radius:50%;border:4px solid rgba(0,0,0,.12);border-top-color:var(--k-accent,#A8836B);
+  animation:spin .8s linear infinite;margin:0 auto 18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- PIN ---------- */
+#pinOv{position:fixed;inset:0;z-index:200;background:rgba(250,247,242,.97);display:flex;flex-direction:column;
+  align-items:center;justify-content:center}
+.pin-dots{display:flex;gap:16px;margin:26px 0 34px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink2)}
+.pin-dot.f{background:var(--ink);border-color:var(--ink)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,78px);gap:14px}
+.pin-pad button{width:78px;height:78px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);
+  font-size:26px;font-weight:600}
+.pin-pad button:active{background:var(--accent-soft)}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+  padding:13px 22px;border-radius:99px;font-size:15px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;max-width:86vw;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="app" class="wrap"></div>
+
+<div id="kiosk" class="hidden"></div>
+<div id="exitZone" class="hidden"></div>
+<div id="pinOv" class="hidden"></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============ LOVENTI MEMORIES — prototyp MVP (web) ============ */
+
+const THEMES = {
+  blush:  {name:"Blush",  bg:"#FBF4F2", ink:"#3D2E2B", accent:"#C98F88"},
+  sand:   {name:"Sand",   bg:"#FAF6EC", ink:"#3A342A", accent:"#B39B62"},
+  forest: {name:"Forest", bg:"#F2F4F0", ink:"#2C332E", accent:"#5F7161"},
+  noir:   {name:"Noir",   bg:"#1E1B18", ink:"#F5F1EA", accent:"#C9A98C"},
+  classic:{name:"Classic",bg:"#FAF7F2", ink:"#1C1917", accent:"#A8836B"}
+};
+const DUR = [15,30,60,90,120];
+
+/* ---------- storage ---------- */
+const store = {
+  load(){ try{ return JSON.parse(localStorage.getItem("lv_events")||"[]"); }catch(e){ return []; } },
+  save(evts){ localStorage.setItem("lv_events", JSON.stringify(evts)); }
+};
+let events = store.load();
+
+let db = null;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open("loventi",1);
+    r.onupgradeneeded = e=>{ e.target.result.createObjectStore("videos",{keyPath:"id"}); };
+    r.onsuccess = e=>{ db=e.target.result; res(); };
+    r.onerror = ()=>rej(r.error);
+  });
+}
+function dbAdd(rec){ return new Promise((res,rej)=>{ const t=db.transaction("videos","readwrite");
+  t.objectStore("videos").add(rec); t.oncomplete=res; t.onerror=()=>rej(t.error); }); }
+function dbAll(eventId){ return new Promise((res)=>{ const out=[];
+  const t=db.transaction("videos"); t.objectStore("videos").openCursor().onsuccess=e=>{
+    const c=e.target.result; if(c){ if(c.value.eventId===eventId) out.push(c.value); c.continue(); } else res(out.sort((a,b)=>b.createdAt-a.createdAt)); };
+}); }
+function dbDel(id){ return new Promise(res=>{ const t=db.transaction("videos","readwrite");
+  t.objectStore("videos").delete(id); t.oncomplete=res; }); }
+function dbCount(eventId){ return dbAll(eventId).then(a=>a.length); }
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const app = $("#app"), kioskEl = $("#kiosk");
+function esc(s){ return (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.style.opacity=1; clearTimeout(t._h); t._h=setTimeout(()=>t.style.opacity=0,2600); }
+function fmtDate(d){ if(!d) return ""; try{ return new Date(d+"T12:00").toLocaleDateString("pl-PL",{day:"numeric",month:"long",year:"numeric"}); }catch(e){ return d; } }
+function initials(t){ return (t||"?").split(/\s|i\s/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(""); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ---------- router ---------- */
+let view = {name:"dashboard"};
+function go(name, params={}){ view={name,...params}; render(); window.scrollTo(0,0); }
+
+async function render(){
+  switch(view.name){
+    case "dashboard": return rDashboard();
+    case "wizard": return rWizard(view.id);
+    case "detail": return rDetail(view.id);
+    case "gallery": return rGallery(view.id);
+  }
+}
+
+/* ---------- dashboard ---------- */
+async function rDashboard(){
+  let cards = "";
+  for(const ev of events){
+    const th = THEMES[ev.theme]||THEMES.classic;
+    const n = db ? await dbCount(ev.id) : 0;
+    cards += `<div class="card event-card" onclick="go('detail',{id:'${ev.id}'})">
+      <div class="event-dot" style="background:${th.accent}">${initials(ev.names)}</div>
+      <div class="event-info">
+        <div class="event-title">${esc(ev.names)}</div>
+        <div class="event-meta">${fmtDate(ev.date)}${ev.venue? " · "+esc(ev.venue):""} · ${n} nagrań</div>
+      </div><div class="chev">›</div></div>`;
+  }
+  app.innerHTML = `
+    <div class="topbar"><div class="brand">LOVENTI <span>MEMORIES</span></div><div class="proto-badge">PROTOTYP</div></div>
+    <h1 class="page">Twoje eventy</h1>
+    <div class="sub">Utwórz event, skonfiguruj kiosk i zbieraj wspomnienia — także offline.</div>
+    ${cards || `<div class="card empty"><div class="big">Zacznij od pierwszego eventu</div>Wesele, urodziny, event firmowy — konfiguracja zajmuje 2 minuty.</div>`}
+    <button class="btn btn-primary" onclick="go('wizard',{})">+ Nowy event</button>
+    <div class="note">Prototyp LOVENTI OS. Nagrania zapisują się lokalnie na tym urządzeniu (offline). W pełnej wersji: synchronizacja z chmurą, galeria dla pary i AI Memory Book.</div>`;
+}
+
+/* ---------- wizard ---------- */
+function rWizard(id){
+  const ev = id ? events.find(e=>e.id===id) : null;
+  const d = ev || {type:"wesele",names:"",date:"",venue:"",msg:"Zostawcie nam kilka słów na pamiątkę",
+                   theme:"blush",duration:60,retakes:3,askName:true,prompt:"",pin:"1234"};
+  app.innerHTML = `
+    <button class="back" onclick="go('${ev?"detail":"dashboard"}'${ev?",{id:'"+ev.id+"'}":""})">‹ Wróć</button>
+    <h1 class="page">${ev? "Edytuj event":"Nowy event"}</h1><div class="sub">Wszystko możesz później zmienić.</div>
+    <div class="card">
+      <div class="field"><label>Typ eventu</label><div class="seg" id="segType">
+        ${["wesele","urodziny","firmowy","inny"].map(t=>`<button data-v="${t}" class="${d.type===t?"on":""}">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}
+      </div></div>
+      <div class="field"><label>Nazwa / imiona</label><input type="text" id="fNames" placeholder="np. Ania i Tomek" value="${esc(d.names)}"></div>
+      <div class="field"><label>Data</label><input type="date" id="fDate" value="${d.date||""}"></div>
+      <div class="field"><label>Miejsce (opcjonalnie)</label><input type="text" id="fVenue" placeholder="np. Dwór Złotopolska" value="${esc(d.venue)}"></div>
+      <div class="field"><label>Wiadomość powitalna</label><textarea id="fMsg" rows="2">${esc(d.msg)}</textarea></div>
+    </div>
+    <div class="card">
+      <div class="field"><label>Motyw</label><div class="swatches" id="swatches">
+        ${Object.entries(THEMES).map(([k,t])=>`<button class="swatch ${d.theme===k?"on":""}" data-v="${k}" title="${t.name}"
+          style="background:linear-gradient(135deg,${t.bg} 50%,${t.accent} 50%)"></button>`).join("")}
+      </div></div>
+      <div class="field"><label>Limit nagrania</label><div class="seg" id="segDur">
+        ${DUR.map(s=>`<button data-v="${s}" class="${d.duration===s?"on":""}">${s}s</button>`).join("")}
+      </div></div>
+      <div class="field"><label>Liczba podejść gościa</label><div class="seg" id="segRet">
+        ${[1,2,3].map(r=>`<button data-v="${r}" class="${d.retakes===r?"on":""}">${r}</button>`).join("")}
+      </div></div>
+      <div class="field"><label>Pytanie-podpowiedź na ekranie (opcjonalnie)</label>
+        <input type="text" id="fPrompt" placeholder="np. Jaka jest Wasza rada na szczęśliwe małżeństwo?" value="${esc(d.prompt)}"></div>
+      <div class="field"><label>Imię gościa</label><div class="seg" id="segName">
+        <button data-v="1" class="${d.askName?"on":""}">Pytaj (opcjonalne)</button>
+        <button data-v="0" class="${!d.askName?"on":""}">Nie pytaj</button>
+      </div></div>
+      <div class="field"><label>PIN wyjścia z kiosku (4 cyfry)</label>
+        <input type="text" id="fPin" inputmode="numeric" maxlength="4" value="${esc(d.pin)}"></div>
+    </div>
+    <button class="btn btn-accent" id="saveEv">${ev? "Zapisz zmiany":"Utwórz event"}</button>`;
+  const sel = {type:d.type, theme:d.theme, duration:d.duration, retakes:d.retakes, askName:d.askName};
+  const wire = (elId,key,cast)=>{ $(elId).addEventListener("click",e=>{ const b=e.target.closest("button[data-v]"); if(!b) return;
+    sel[key]=cast?cast(b.dataset.v):b.dataset.v;
+    [...$(elId).children].forEach(c=>c.classList.toggle("on",c===b)); }); };
+  wire("#segType","type"); wire("#segDur","duration",Number); wire("#segRet","retakes",Number);
+  wire("#segName","askName",v=>v==="1"); wire("#swatches","theme");
+  $("#saveEv").onclick = ()=>{
+    const names = $("#fNames").value.trim();
+    if(!names){ toast("Podaj nazwę lub imiona"); return; }
+    const pin = ($("#fPin").value.match(/^\d{4}$/)||["1234"])[0];
+    const rec = {id: ev?ev.id:uid(), ...sel, names, date:$("#fDate").value, venue:$("#fVenue").value.trim(),
+      msg:$("#fMsg").value.trim(), prompt:$("#fPrompt").value.trim(), pin};
+    if(ev){ events = events.map(e=>e.id===ev.id?rec:e); } else events.unshift(rec);
+    store.save(events); toast(ev? "Zapisano":"Event utworzony"); go("detail",{id:rec.id});
+  };
+}
+
+/* ---------- detail ---------- */
+async function rDetail(id){
+  const ev = events.find(e=>e.id===id); if(!ev) return go("dashboard");
+  const th = THEMES[ev.theme]||THEMES.classic;
+  const n = db ? await dbCount(ev.id) : 0;
+  app.innerHTML = `
+    <button class="back" onclick="go('dashboard')">‹ Eventy</button>
+    <h1 class="page">${esc(ev.names)}</h1>
+    <div class="sub">${fmtDate(ev.date)}${ev.venue? " · "+esc(ev.venue):""} · motyw ${th.name} · limit ${ev.duration}s</div>
+    <div class="stat-row">
+      <div class="stat"><div class="n">${n}</div><div class="l">nagrań</div></div>
+      <div class="stat"><div class="n">${ev.retakes}</div><div class="l">podejścia</div></div>
+      <div class="stat"><div class="n">${ev.duration}s</div><div class="l">limit</div></div>
+    </div>
+    <button class="btn btn-accent" style="margin-bottom:12px" onclick="startKiosk('${ev.id}','video')">▶&nbsp; Start kiosku — Video Guestbook</button>
+    <button class="btn btn-ghost" style="margin-bottom:12px" onclick="startKiosk('${ev.id}','welcome')">Welcome Board</button>
+    <button class="btn btn-ghost" style="margin-bottom:12px" onclick="go('gallery',{id:'${ev.id}'})">Galeria nagrań (${n})</button>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="go('wizard',{id:'${ev.id}'})">Edytuj</button>
+      <button class="btn btn-danger-ghost" onclick="delEvent('${ev.id}')">Usuń event</button>
+    </div>
+    <div class="note">Wyjście z kiosku: przytrzymaj <b>lewy górny róg ekranu przez 3 sekundy</b>, potem wpisz PIN (${esc(ev.pin)}). Przed weselem: podłącz zasilanie i dodaj stronę do ekranu początkowego (pełny ekran).</div>`;
+}
+function delEvent(id){
+  if(!confirm("Usunąć event i wszystkie jego nagrania z tego urządzenia?")) return;
+  dbAll(id).then(list=>Promise.all(list.map(v=>dbDel(v.id)))).then(()=>{
+    events = events.filter(e=>e.id!==id); store.save(events); go("dashboard");
+  });
+}
+
+/* ---------- gallery ---------- */
+async function rGallery(id){
+  const ev = events.find(e=>e.id===id); if(!ev) return go("dashboard");
+  const vids = await dbAll(id);
+  app.innerHTML = `
+    <button class="back" onclick="go('detail',{id:'${id}'})">‹ ${esc(ev.names)}</button>
+    <h1 class="page">Galeria</h1><div class="sub">${vids.length} nagrań · zapisane lokalnie (offline)</div>
+    <div class="gal-grid" id="grid"></div>
+    ${vids.length? "":`<div class="card empty"><div class="big">Jeszcze pusto</div>Uruchom kiosk i nagraj pierwszą wiadomość.</div>`}
+    <div class="note">W pełnej wersji: automatyczna synchronizacja do chmury, link do galerii dla pary, eksport ZIP i AI Memory Book.</div>`;
+  const grid = $("#grid");
+  for(const v of vids){
+    const url = URL.createObjectURL(v.blob);
+    const el = document.createElement("div");
+    el.innerHTML = `<div class="gal-item"><video src="${url}" playsinline preload="metadata" controls></video>
+        <div class="gal-name">${esc(v.name||"Gość")} · ${Math.round(v.duration)}s</div></div>
+      <div class="gal-actions"><button data-a="dl">Pobierz</button><button data-a="del" class="del">Usuń</button></div>`;
+    el.querySelector('[data-a=dl]').onclick = ()=>{
+      const a=document.createElement("a"); a.href=url; a.download=`loventi_${esc(ev.names).replace(/\W+/g,"_")}_${v.id}.${v.ext||"mp4"}`;
+      document.body.appendChild(a); a.click(); a.remove(); };
+    el.querySelector('[data-a=del]').onclick = async ()=>{ if(confirm("Usunąć to nagranie?")){ await dbDel(v.id); rGallery(id); } };
+    grid.appendChild(el);
+  }
+}
+
+/* ============ KIOSK ============ */
+let K = null; // kiosk state
+let wakeLock = null;
+
+async function startKiosk(id, mode){
+  const ev = events.find(e=>e.id===id); if(!ev) return;
+  K = {ev, mode, tries:0, stream:null, rec:null, chunks:[], blob:null, guestName:"", timers:[]};
+  const th = THEMES[ev.theme]||THEMES.classic;
+  kioskEl.style.setProperty("--k-bg",th.bg);
+  kioskEl.style.setProperty("--k-ink",th.ink);
+  kioskEl.style.setProperty("--k-accent",th.accent);
+  kioskEl.style.color = th.ink; kioskEl.style.background = th.bg;
+  kioskEl.classList.remove("hidden"); $("#exitZone").classList.remove("hidden");
+  try{ if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); }catch(e){}
+  try{ wakeLock = await navigator.wakeLock?.request("screen"); }catch(e){}
+  if(mode==="welcome") kWelcome(); else kAttract();
+}
+function clearTimers(){ K.timers.forEach(clearTimeout); K.timers=[]; }
+function after(ms,fn){ K.timers.push(setTimeout(fn,ms)); }
+
+function exitKiosk(){
+  clearTimers(); stopStream();
+  kioskEl.classList.add("hidden"); $("#exitZone").classList.add("hidden");
+  try{ document.exitFullscreen&&document.exitFullscreen(); }catch(e){}
+  try{ wakeLock&&wakeLock.release(); }catch(e){}
+  const id = K.ev.id; K=null; go("detail",{id});
+}
+function stopStream(){ if(K&&K.stream){ K.stream.getTracks().forEach(t=>t.stop()); K.stream=null; } }
+
+/* --- welcome board --- */
+function kWelcome(){
+  const ev=K.ev;
+  kioskEl.innerHTML = `
+    <div class="k-orn">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <div class="k-eyebrow">${ev.type==="wesele"?"Witamy na weselu":"Witamy"}</div>
+    <div class="k-title">${esc(ev.names)}</div>
+    <div class="k-sub">${fmtDate(ev.date)}${ev.venue? " · "+esc(ev.venue):""}</div>
+    ${ev.msg? `<div class="k-msg">„${esc(ev.msg)}”</div>`:""}`;
+}
+
+/* --- video guestbook flow --- */
+function kAttract(){
+  clearTimers(); stopStream(); K.tries=0; K.blob=null; K.guestName="";
+  const ev=K.ev;
+  kioskEl.innerHTML = `
+    <div class="k-eyebrow">Wideo księga gości</div>
+    <div class="k-title">${esc(ev.names)}</div>
+    <div class="k-sub">${fmtDate(ev.date)}</div>
+    <button class="k-cta" id="ctaGo">Dotknij, aby zostawić życzenia&nbsp;♥</button>`;
+  $("#ctaGo").onclick = kInstruction;
+}
+function kInstruction(){
+  clearTimers();
+  const ev=K.ev;
+  kioskEl.innerHTML = `
+    <div class="k-eyebrow">Jak to działa</div>
+    <div class="k-title" style="font-size:clamp(28px,5vw,54px)">Po odliczeniu nagraj wiadomość<br>— masz ${ev.duration} sekund</div>
+    ${ev.prompt? `<div class="k-msg">„${esc(ev.prompt)}”</div>`:""}
+    ${ev.askName? `<input class="k-nameInput" id="gName" type="text" placeholder="Twoje imię (opcjonalnie)" autocomplete="off">`:""}
+    <div style="display:flex;gap:16px;margin-top:5vh">
+      <button class="k-btn sec" id="bBack">Wróć</button>
+      <button class="k-btn pri" id="bRec">Nagraj wiadomość</button>
+    </div>
+    <div style="opacity:.45;font-size:14px;margin-top:26px;max-width:32em;padding:0 8vw">Nagranie zostanie zapisane na pamiątkę dla ${esc(ev.names)}. Dotykając „Nagraj” wyrażasz zgodę na utrwalenie wizerunku.</div>`;
+  $("#bBack").onclick = kAttract;
+  $("#bRec").onclick = ()=>{ K.guestName = ev.askName? ($("#gName").value.trim()):""; kCountdown(); };
+  after(60000,kAttract);
+}
+async function kCountdown(){
+  clearTimers();
+  /* uruchom kamerę w tle podczas odliczania */
+  try{
+    if(!K.stream){
+      K.stream = await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:"user", width:{ideal:1280}, height:{ideal:720}}, audio:true});
+    }
+  }catch(err){
+    kioskEl.innerHTML = `<div class="k-title" style="font-size:clamp(24px,4vw,40px)">Brak dostępu do kamery</div>
+      <div class="k-sub" style="max-width:30em;padding:0 8vw">Zezwól na dostęp do kamery i mikrofonu w Safari (aA → Ustawienia witryny), potem spróbuj ponownie.</div>
+      <button class="k-btn pri" style="margin-top:5vh" onclick="kAttract()">Wróć</button>`;
+    return;
+  }
+  let n=3;
+  const tick = ()=>{
+    if(n===0) return kRecord();
+    kioskEl.innerHTML = `<div class="k-count">${n}</div>`;
+    n--; after(1000,tick);
+  };
+  tick();
+}
+function pickMime(){
+  const c=["video/mp4","video/webm;codecs=vp9,opus","video/webm"];
+  for(const m of c){ if(window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m; }
+  return "";
+}
+function kRecord(){
+  clearTimers();
+  const ev=K.ev;
+  kioskEl.innerHTML = `
+    <div id="camWrap"><video id="cam" autoplay muted playsinline></video></div>
+    <div id="recRing"></div><div id="recBar"><div id="recFill"></div></div>
+    <div id="recTime"><span id="recDot"></span><span id="tLeft">${ev.duration}</span> s</div>
+    <button id="stopBtn">Zakończ wcześniej</button>`;
+  $("#cam").srcObject = K.stream;
+  const mime = pickMime();
+  K.chunks=[];
+  try{
+    K.rec = new MediaRecorder(K.stream, mime? {mimeType:mime, videoBitsPerSecond:5_000_000}:{});
+  }catch(e){ K.rec = new MediaRecorder(K.stream); }
+  K.rec.ondataavailable = e=>{ if(e.data.size) K.chunks.push(e.data); };
+  const t0 = Date.now();
+  K.rec.onstop = ()=>{
+    const type = K.rec.mimeType||mime||"video/mp4";
+    K.blob = new Blob(K.chunks,{type});
+    K.recDuration = (Date.now()-t0)/1000;
+    K.ext = type.includes("mp4")?"mp4":"webm";
+    kPreview();
+  };
+  K.rec.start(1000); /* segmenty co 1 s — crash-safe w duchu specyfikacji */
+  let left = ev.duration;
+  const iv = setInterval(()=>{
+    left--; const f=$("#recFill"), tl=$("#tLeft");
+    if(tl) tl.textContent=Math.max(left,0);
+    if(f) f.style.width = (100*(ev.duration-left)/ev.duration)+"%";
+    if(left<=0){ clearInterval(iv); if(K.rec.state!=="inactive") K.rec.stop(); }
+  },1000);
+  K.timers.push(iv);
+  $("#stopBtn").onclick = ()=>{ clearInterval(iv); if(K.rec.state!=="inactive") K.rec.stop(); };
+}
+function kPreview(){
+  clearTimers();
+  const url = URL.createObjectURL(K.blob);
+  const canRetake = K.tries < K.ev.retakes-1;
+  kioskEl.innerHTML = `
+    <video id="prevVideo" src="${url}" autoplay playsinline controls></video>
+    <div class="prev-bar">
+      ${canRetake? `<button class="k-btn sec" id="bRetake">Nagraj ponownie (${K.ev.retakes-1-K.tries})</button>`:""}
+      <button class="k-btn pri" id="bSend">Wyślij&nbsp;♥</button>
+    </div>`;
+  $("#bSend").onclick = kSave;
+  if(canRetake) $("#bRetake").onclick = ()=>{ K.tries++; kCountdown(); };
+  after(90000,kSave); /* idle → bezpiecznie zapisujemy */
+}
+async function kSave(){
+  clearTimers();
+  kioskEl.innerHTML = `<div class="spin"></div><div class="k-sub">Zapisujemy…</div>`;
+  try{
+    await dbAdd({id:uid(), eventId:K.ev.id, blob:K.blob, name:K.guestName,
+      duration:K.recDuration||K.ev.duration, ext:K.ext, createdAt:Date.now()});
+  }catch(e){ toast("Błąd zapisu: "+e.message); }
+  stopStream();
+  kioskEl.innerHTML = `
+    <div class="k-heart" style="color:var(--k-accent)">♥</div>
+    <div class="k-title" style="font-size:clamp(30px,6vw,64px)">Dziękujemy${K.guestName? ", "+esc(K.guestName):""}!</div>
+    <div class="k-sub">Wasze słowa zostaną z ${esc(K.ev.names)} na zawsze.</div>`;
+  after(3200,kAttract);
+}
+
+/* ---------- hidden exit + PIN ---------- */
+(function(){
+  const zone = $("#exitZone"); let hold=null;
+  const start=()=>{ hold=setTimeout(showPin,3000); };
+  const cancel=()=>{ clearTimeout(hold); };
+  zone.addEventListener("touchstart",start); zone.addEventListener("touchend",cancel);
+  zone.addEventListener("mousedown",start); zone.addEventListener("mouseup",cancel); zone.addEventListener("mouseleave",cancel);
+})();
+function showPin(){
+  if(!K) return;
+  const ov=$("#pinOv"); let entered="";
+  const draw=()=>{ ov.innerHTML = `
+    <div style="font-family:var(--serif);font-size:26px;font-weight:600">Wyjście z trybu kiosku</div>
+    <div class="pin-dots">${[0,1,2,3].map(i=>`<div class="pin-dot ${i<entered.length?"f":""}"></div>`).join("")}</div>
+    <div class="pin-pad">
+      ${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-n="${n}">${n}</button>`).join("")}
+      <button data-n="c" style="font-size:15px;color:var(--ink2)">Anuluj</button>
+      <button data-n="0">0</button>
+      <button data-n="b" style="font-size:20px">⌫</button>
+    </div>`;
+    ov.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      const v=b.dataset.n;
+      if(v==="c"){ ov.classList.add("hidden"); return; }
+      if(v==="b"){ entered=entered.slice(0,-1); draw(); return; }
+      if(entered.length<4){ entered+=v; draw();
+        if(entered.length===4){
+          if(entered===K.ev.pin){ ov.classList.add("hidden"); exitKiosk(); }
+          else{ entered=""; toast("Błędny PIN"); setTimeout(draw,150); }
+        } }
+    });
+  };
+  draw(); ov.classList.remove("hidden");
+}
+
+/* ---------- init ---------- */
+window.go=go; window.startKiosk=startKiosk; window.delEvent=delEvent; window.kAttract=kAttract;
+openDB().then(render).catch(()=>{ render(); toast("Uwaga: brak dostępu do pamięci lokalnej"); });
+</script>
+</body>
+</html>
